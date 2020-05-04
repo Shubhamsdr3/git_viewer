@@ -1,0 +1,22 @@
+{
+  "sha": "111",
+  "url": "add",
+  "tree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "123",
+      "size": 692,
+      "url": "https://api.github.com/repos/manishag777/digyed_reader/git/blobs/1ba9c339effbc581d2b9eb52b0407d5b49770b32"
+    },
+    {
+      "path": "lib",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "124",
+      "url": "https://api.github.com/repos/manishag777/digyed_reader/git/trees/fc563a22993e7e18745f1191f94d91f1164c8158"
+    }
+  ],
+  "truncated": false
+}

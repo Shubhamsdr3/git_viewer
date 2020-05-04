@@ -1,0 +1,8 @@
+{
+  "name": "master",
+  "commit": {
+    "sha": "122",
+    "url": "https:abc.com/commits/122"
+  },
+  "protected": false
+}
