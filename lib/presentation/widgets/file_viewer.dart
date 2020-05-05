@@ -9,7 +9,8 @@ import '../../injection_container.dart' as di;
 
 class FileViewer extends StatelessWidget {
   final TreeNodeEntity treeNodeEntity;
-  FileViewer(@required this.treeNodeEntity);
+  FileViewer(@required this.treeNodeEntity){
+  }
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -21,7 +22,8 @@ class FileViewer extends StatelessWidget {
 
 class _FileViewer extends StatefulWidget {
   TreeNodeEntity treeNodeEntity;
-  _FileViewer(this.treeNodeEntity);
+  _FileViewer(this.treeNodeEntity){
+  }
 
   @override
   __FileViewerState createState() => __FileViewerState();
@@ -31,13 +33,22 @@ class __FileViewerState extends State<_FileViewer> {
 
   @override
   void didChangeDependencies() {
-    print("Did change dependencies called");
-    print(widget.treeNodeEntity);
     super.didChangeDependencies();
     BlocProvider.of<FileViewerBloc>(context)
         .add(GetRawContentEvent(widget.treeNodeEntity));
 
   }
+
+
+  @override
+  void didUpdateWidget(_FileViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if((oldWidget!=widget)) {
+      BlocProvider.of<FileViewerBloc>(context)
+          .add(GetRawContentEvent(widget.treeNodeEntity));
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +58,7 @@ class __FileViewerState extends State<_FileViewer> {
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(4.0),
-              child: Text(state.content),
+              child: SelectableText(state.content),
             ),
           );
         }else if(state is Loading){
@@ -58,20 +69,4 @@ class __FileViewerState extends State<_FileViewer> {
       },
     );
   }
-}
-
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await di.init();
-
-  TreeNodeEntity treeNodeEntity = TreeNodeEntity();
-  treeNodeEntity.branch = 'master';
-  treeNodeEntity.path = '.gitignore';
-
-  runApp(MaterialApp(
-    home: Scaffold(
-      body: FileViewer(treeNodeEntity),
-    ),
-  ));
 }

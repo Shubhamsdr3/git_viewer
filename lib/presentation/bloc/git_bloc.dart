@@ -21,11 +21,9 @@ class GitBloc extends Bloc<GitEvent, GitState> {
 
   @override
   Stream<GitState> mapEventToState(GitEvent event) async* {
-    print(event);
     if(event is GetAllBranchEvent){
       yield Loading();
       final failureOrBranches = await getAllBranches(NoParams());
-      print(failureOrBranches);
       yield failureOrBranches.fold(
           (failure) => Error(message: "Error loading branches"),
           (branchList) => Loaded(branchList)

@@ -15,15 +15,15 @@ abstract class GitDataSource {
 
 class GitDataSourceImpl implements GitDataSource{
   final String baseUrl = 'https://api.github.com/repos/manishag777/digyed_reader';
-  final dynamic header = {
-    'Content-Type': 'application/json'
-  };
 
   final http.Client client;
 
   GitDataSourceImpl({@required this.client});
 
   dynamic _fetchDataFromApi(String url, Function(String) decoder) async {
+    dynamic header = {
+      'Content-Type': 'application/json'
+    };
     final response = await client.get(
         url,
         headers: header
@@ -82,7 +82,8 @@ class GitDataSourceImpl implements GitDataSource{
     Function decoder = (String body){
       return GithubTreeModel.fromJson(json.decode(body));
     };
-    return await _fetchDataFromApi(url, decoder);
+    dynamic data =  await _fetchDataFromApi(url, decoder);
+    return data;
   }
 
   @override

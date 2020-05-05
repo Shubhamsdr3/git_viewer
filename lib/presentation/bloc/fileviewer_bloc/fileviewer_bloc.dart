@@ -20,11 +20,9 @@ class FileViewerBloc extends Bloc<FileViewerEvent, FileViewerState> {
 
   @override
   Stream<FileViewerState> mapEventToState(FileViewerEvent event) async* {
-    print(event);
     if(event is GetRawContentEvent){
       yield Loading();
       final failureOrBranches = await getRawContent(Params(treeNodeEntity: event.treeNodeEntity));
-      print(failureOrBranches);
       yield failureOrBranches.fold(
           (failure) => Error(message: "Error loading branches"),
           (content) => Loaded(content)

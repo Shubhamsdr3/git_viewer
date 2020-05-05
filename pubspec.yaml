@@ -35,6 +35,7 @@ dependencies:
   flutter_bloc: ^3.0.0
   meta: ^1.1.8
   material_design_icons_flutter: ^4.0.5145
+  provider:
 
 
 

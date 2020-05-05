@@ -14,7 +14,13 @@ class GetSubFolders implements UseCase<List<TreeNodeEntity>, Params>{
 
   @override
   Future<Either<Failure, List<TreeNodeEntity>>> call(Params params) async{
-    return await repository.getChildNodes(params.treeNodeEntity);
+    try {
+      dynamic data = await repository.getChildNodes(params.treeNodeEntity);
+      return data;
+    }catch(e){
+      return Left(ServerFailure());
+    }
+
   }
 
 }

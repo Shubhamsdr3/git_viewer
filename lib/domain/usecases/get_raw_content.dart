@@ -14,7 +14,6 @@ class GetRawContent implements UseCase<String, Params>{
 
   @override
   Future<Either<Failure, String>> call(Params params) async{
-    print("pushing get raw content");
     return await repository.getRawContent(params.treeNodeEntity);
   }
 

@@ -20,7 +20,6 @@ class FolderBloc extends Bloc<FolderEvent, FolderState> {
 
   @override
   Stream<FolderState> mapEventToState(FolderEvent event) async* {
-    print(event);
     if(event is GetSubFolderEvent){
       yield Loading();
       final failureOrBranches = await getSubFolders(Params(treeNodeEntity: event.treeNodeEntity));

@@ -28,10 +28,13 @@ class GitRepositoryImpl implements GitRepository{
   @override
   Future<Either<Failure, List<TreeNodeEntity>>> getChildNodes(TreeNodeEntity treeNodeEntity) async{
     try{
+      if(treeNodeEntity.treeNodeList!=null)
+        return Right(treeNodeEntity.treeNodeList);
+
       GithubTreeModel githubTreeModel = await gitDataSource.getGithubTree(treeNodeEntity.id);
       return Right(githubTreeModel.tree.map((e) {
         TreeNodeEntity nodeEntity = TreeNodeEntity.from(e);
-        nodeEntity.path = treeNodeEntity.path +"/"+nodeEntity.fileName;
+        nodeEntity.path = treeNodeEntity.path??"" + "/"+nodeEntity.fileName;
         nodeEntity.branch = treeNodeEntity.branch;
         return nodeEntity;
       }).toList());

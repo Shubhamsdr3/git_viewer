@@ -22,6 +22,7 @@ class TreeNodeEntity extends Equatable{
   final String id;
   final String fileName;
   final bool isLeafNode;
+  bool _isOpened = false;
   String _path;
   String _branch;
 
@@ -35,6 +36,13 @@ class TreeNodeEntity extends Equatable{
       fileName: githubTreeNodeModel.path,
       isLeafNode: githubTreeNodeModel.isLeafNode
     );
+  }
+
+
+  bool get isOpened => _isOpened;
+
+  set isOpened(bool value) {
+    _isOpened = value;
   }
 
   String get path => _path;
@@ -57,5 +65,5 @@ class TreeNodeEntity extends Equatable{
 
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [id, fileName];
 }
