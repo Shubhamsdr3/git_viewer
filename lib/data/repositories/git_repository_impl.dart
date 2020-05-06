@@ -34,7 +34,7 @@ class GitRepositoryImpl implements GitRepository{
       GithubTreeModel githubTreeModel = await gitDataSource.getGithubTree(treeNodeEntity.id);
       return Right(githubTreeModel.tree.map((e) {
         TreeNodeEntity nodeEntity = TreeNodeEntity.from(e);
-        nodeEntity.path = treeNodeEntity.path??"" + "/"+nodeEntity.fileName;
+        nodeEntity.path = (treeNodeEntity.path??"") + "/"+ nodeEntity.fileName;
         nodeEntity.branch = treeNodeEntity.branch;
         return nodeEntity;
       }).toList());

@@ -88,7 +88,7 @@ class GitDataSourceImpl implements GitDataSource{
 
   @override
   Future<String> getGitContent(String branchName, String filePath) async{
-    String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/'+branchName+"/"+filePath;
+    String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/'+branchName+filePath;
     Function decoder = (String body){
       return body;
     };
@@ -96,18 +96,3 @@ class GitDataSourceImpl implements GitDataSource{
   }
   
 }
-
-
-//void main() async{
-//  dynamic client = http.Client();
-//  GitDataSource gdil = GitDataSourceImpl(client: client);
-////  List<BranchModel> xyz = await gdil.getAllBranches();
-////  CommitDetailModel abc = await gdil.getCommitDetail(xyz[0].commit.sha);
-////  GithubTreeModel pqr = await gdil.getGithubTree(abc.tree.sha);
-//  try {
-//    String content = await gdil.getGitContent('master', '.gitignore');
-//  } catch (e){
-//    print(e);
-//  }
-//
-//}

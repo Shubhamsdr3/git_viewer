@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:git_viewer/presentation/pages/git_viewer.dart';
 
-import 'presentation/pages/git_viewer.dart';
 import 'injection_container.dart' as di;
 
 

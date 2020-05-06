@@ -16,76 +16,161 @@ class GitViewer extends StatelessWidget {
           create: (context){ return GitViewerViewModel();},
         )
       ],
-      child: Row(
+      child: GitViewerLayout(),
+    );
+  }
+
+}
+
+
+class GitViewerLayout extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 30,
+              decoration: BoxDecoration(border: Border.all()),
+            ),
+            Expanded(child: Row(
+              children: <Widget>[
+                fileExplorerLayout(),
+                fileViewerLayout()
+              ],
+            ),),
+            Container(
+              height: 30,
+              decoration: BoxDecoration(border: Border.all()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget fileExplorerLayout()  {
+    return Container(
+      width: 250,
+      decoration: BoxDecoration(border: Border.all()),
+      child: Column(
         children: <Widget>[
-
-          SizedBox(
-            width: 200,
-            child: Consumer<GitViewerViewModel>(builder: (BuildContext context, GitViewerViewModel model, Widget child) {
-              return FileExplorerContainer(nodeEntity: model.rootNode);
-            },),
+          Container(
+            height: 30,
+            decoration: BoxDecoration(border: Border.all()),
           ),
-          Consumer<GitViewerViewModel>(builder: (BuildContext context, GitViewerViewModel model, Widget child) {
-            return FileViewerTabsContainer();
-          },)
-
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(border: Border.all()),
+              child: FileExplorerContainer(),
+            ),
+          )
         ],
       ),
     );
   }
-}
 
-class FileExplorerContainer extends StatelessWidget {
-  
-  final TreeNodeEntity nodeEntity;
-  FileExplorerContainer({this.nodeEntity});
-  
-  
-  @override
-  Widget build(BuildContext context) {
-    return FileExplorer(nodeEntity: nodeEntity);
+  Widget fileViewerLayout()  {
+    return Expanded(
+        child: Container(
+          decoration: BoxDecoration(border: Border.all()),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                height: 30,
+                decoration: BoxDecoration(border: Border.all()),
+                child: FileSelectionTabs(),
+              ),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(border: Border.all()),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FileViewerContainer(),
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
+    );
   }
 }
 
-class FileViewerTabsContainer extends StatelessWidget {
+class FileViewerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
-    List<TreeNodeEntity> treeNodeEntityList = gitViewerViewModel.nodesInViewer;
-    TreeNodeEntity selectedNode = gitViewerViewModel.selectedNode;
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: treeNodeEntityList.map((node){
-            return getTabButton(node, node==selectedNode);
-          }).toList(),
-        ),
-        if(selectedNode!=null)
-          Expanded(child: FileViewer(selectedNode))
-      ],
+    return Consumer<GitViewerViewModel>(
+      builder: (BuildContext context, GitViewerViewModel model, Widget child){
+        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
+        return selectedNode!=null ? FileViewer(selectedNode): Container();
+      },
+    );
+  }
+}
+
+
+
+class FileExplorerContainer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GitViewerViewModel>(
+        builder: (BuildContext context, GitViewerViewModel model, Widget child){
+          return FileExplorer(nodeEntity: model.rootNode);
+        },
+    );
+  }
+}
+
+class FileSelectionTabs extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GitViewerViewModel>(
+        builder: (BuildContext context, GitViewerViewModel model, Widget child){
+          
+          GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
+          List<TreeNodeEntity> treeNodeEntityList = gitViewerViewModel.nodesInViewer;
+          TreeNodeEntity selectedNode = gitViewerViewModel.selectedNode;
+          
+          return Row(
+            children: treeNodeEntityList.map((node){
+              return getTabButton(node, node==selectedNode);
+            }).toList(),
+          );
+        }
     );
   }
 
   Widget getTabButton(TreeNodeEntity node, bool isSelected){
     return Builder(builder: (context){
-      return Row(children: <Widget>[
-        InkWell(
-            onTap: (){
-              Provider.of<GitViewerViewModel>(context, listen: false).selectedNode = node;
-            },
-            child: Text(node.fileName)
+      return Container(
+        decoration: BoxDecoration(border: Border.all(), color: isSelected?Colors.white : Colors.grey),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              InkWell(
+                  onTap: (){
+                    Provider.of<GitViewerViewModel>(context, listen: false).selectedNode = node;
+                  },
+                  child: Text(node.fileName)
+              ),
+              InkWell(child: Icon(Icons.cancel), onTap: (){
+                Provider.of<GitViewerViewModel>(context, listen: false).removeNode(node);
+              },)
+            ],),
         ),
-        IconButton(icon: Icon(Icons.cancel), onPressed: (){
-          Provider.of<GitViewerViewModel>(context, listen: false).removeNode(node);
-        },)
-      ],);
+      );
     },);
   }
 
 }
-
 
 
 
