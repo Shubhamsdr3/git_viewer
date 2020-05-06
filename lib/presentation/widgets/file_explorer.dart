@@ -23,6 +23,8 @@ class FileExplorer extends StatelessWidget {
       create: (_) => di.sl<FolderBloc>(),
       child: BlocBuilder<FolderBloc, FolderState>(builder: (context, state) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+
           children: <Widget>[
             GestureDetector(
               onTap: () {
@@ -75,6 +77,7 @@ class FileExplorer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: list
             .map((e) => FileExplorer(
                   nodeEntity: e,

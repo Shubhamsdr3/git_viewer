@@ -35,6 +35,7 @@ class GitViewerLayout extends StatelessWidget {
             Container(
               height: 30,
               decoration: BoxDecoration(border: Border.all()),
+              child: topBar(),
             ),
             Expanded(child: Row(
               children: <Widget>[
@@ -52,11 +53,24 @@ class GitViewerLayout extends StatelessWidget {
     );
   }
 
+  Widget topBar(){
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+          child: FilePathContainer(),
+        ),
+      ],
+    );
+  }
+
   Widget fileExplorerLayout()  {
     return Container(
       width: 250,
       decoration: BoxDecoration(border: Border.all()),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             height: 30,
@@ -64,6 +78,7 @@ class GitViewerLayout extends StatelessWidget {
           ),
           Expanded(
             child: Container(
+              width: double.infinity,
               decoration: BoxDecoration(border: Border.all()),
               child: FileExplorerContainer(),
             ),
@@ -88,7 +103,7 @@ class GitViewerLayout extends StatelessWidget {
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  decoration: BoxDecoration(border: Border.all()),
+                  decoration: BoxDecoration(border: Border.all(color: Colors.green),),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FileViewerContainer(),
@@ -98,6 +113,18 @@ class GitViewerLayout extends StatelessWidget {
             ],
           ),
         )
+    );
+  }
+}
+
+class FilePathContainer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GitViewerViewModel>(
+      builder: (BuildContext context, GitViewerViewModel model, Widget child){
+        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
+        return selectedNode!=null ? Text(selectedNode.path): Container();
+      },
     );
   }
 }
@@ -114,14 +141,17 @@ class FileViewerContainer extends StatelessWidget {
   }
 }
 
-
-
 class FileExplorerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<GitViewerViewModel>(
         builder: (BuildContext context, GitViewerViewModel model, Widget child){
-          return FileExplorer(nodeEntity: model.rootNode);
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: FileExplorer(nodeEntity: model.rootNode)),
+          );
         },
     );
   }
