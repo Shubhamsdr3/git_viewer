@@ -87,12 +87,21 @@ class GitDataSourceImpl implements GitDataSource{
   }
 
   @override
-  Future<String> getGitContent(String branchName, String filePath) async{
-    String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/'+branchName+filePath;
-    Function decoder = (String body){
-      return body;
-    };
-    return await _fetchStringDataFromApi(url, decoder);
+  Future<String> getGitContent(String branchName, String filePath) async {
+    String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/' +
+        branchName + filePath;
+    print(url);
+    try {
+      Function decoder = (String body) {
+        return body;
+      };
+      String rawContent = await _fetchStringDataFromApi(url, decoder);
+      print(rawContent);
+      return rawContent;
+    }
+    catch (e) {
+      print(e);
+      return "Error Content";
+    }
   }
-  
 }

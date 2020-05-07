@@ -1,12 +1,69 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
+import 'package:git_viewer/domain/repositories/git_repository.dart';
+
+import '../../injection_container.dart';
+import 'base_view_model.dart';
+
+
+class BranchViewModel extends BaseViewModel{
+  GitRepository gitRepository = sl<GitRepository>();
+  List<BranchEntity> _branchList;
+
+  Future fetchBranches() async {
+    setBusy(true);
+    final failureOrBranches = await gitRepository.getAllBranches();
+    failureOrBranches.fold((l) => null, (r) {
+      _branchList = r;
+    });
+    setBusy(false);
+  }
+
+  List<BranchEntity> get branchList => _branchList;
+}
+
+class FileViewerViewModel extends BaseViewModel{
+  GitRepository gitRepository = sl<GitRepository>();
+
+  String _content;
+  TreeNodeEntity _nodeEntity;
+  FileViewerViewModel();
+
+  String get content => _content;
+
+
+  Future fetchContent(TreeNodeEntity nodeEntity) async {
+    setBusy(true);
+    _nodeEntity = nodeEntity;
+    final failureOrContent = await gitRepository.getRawContent(nodeEntity);
+    failureOrContent.fold(
+            (l) {_content = "Error loading the content";},
+            (r) {_content = r;}
+            );
+    setBusy(false);
+    notifyListeners();
+  }
+
+}
+
 
 class GitViewerViewModel extends ChangeNotifier {
 
+  List<BranchEntity> branchList;
   List<TreeNodeEntity> nodesInViewer;
   TreeNodeEntity _selectedNode;
   TreeNodeEntity _rootNode;
+  GitRepository gitRepository = sl<GitRepository>();
+  BranchEntity _selectedBranch;
+
+  BranchEntity get selectedBranch => _selectedBranch;
+
+  GitViewerViewModel({this.branchList}){
+    nodesInViewer = [];
+    if(branchList!=null && branchList.isNotEmpty)
+      _selectedBranch = branchList[0];
+  }
 
   TreeNodeEntity get rootNode {
     if (_rootNode ==null) {
@@ -18,6 +75,16 @@ class GitViewerViewModel extends ChangeNotifier {
     }
     return _rootNode;
   }
+
+  void updateRootNode(BranchEntity branchEntity) async{
+    print("Updating Root node");
+    _selectedBranch = branchEntity;
+    (await gitRepository.getRootNode(branchEntity)).fold((l) => null, (r) {
+      _rootNode = r;
+      notifyListeners();
+    });
+  }
+
 
   set rootNode(TreeNodeEntity value) {
     _rootNode = value;
@@ -34,10 +101,6 @@ class GitViewerViewModel extends ChangeNotifier {
   set selectedNode(TreeNodeEntity value) {
     _selectedNode = value;
     notifyListeners();
-  }
-
-  GitViewerViewModel(){
-    nodesInViewer = [];
   }
 
   void addNode(TreeNodeEntity treeNodeEntity){

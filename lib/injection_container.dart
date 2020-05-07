@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:git_viewer/presentation/bloc/fileviewer_bloc/fileviewer_bloc.dart';
+import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
 import 'package:http/http.dart' as http;
 
 import 'data/datasources/git_data_source.dart';
@@ -24,17 +24,14 @@ Future<void> init() async {
   );
 
   sl.registerFactory(
-        () => FileViewerBloc(
-          getRawContent: sl(),
-    ),
-  );
-
-  sl.registerFactory(
         () => FolderBloc(
           getSubFolders: sl(),
     ),
   );
 
+  // ViewModels
+  sl.registerFactory(() => BranchViewModel());
+  sl.registerFactory(() => FileViewerViewModel());
 
   // Use cases
   sl.registerLazySingleton(() => GetAllBranches(sl()));

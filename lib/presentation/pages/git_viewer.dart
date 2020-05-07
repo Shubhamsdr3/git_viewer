@@ -3,20 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
+import 'package:git_viewer/presentation/widgets/drop_down.dart';
 import 'package:git_viewer/presentation/widgets/file_explorer.dart';
 import 'package:git_viewer/presentation/widgets/file_viewer.dart';
 import 'package:provider/provider.dart';
 
+import 'base_view.dart';
+
 class GitViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<GitViewerViewModel>(
-          create: (context){ return GitViewerViewModel();},
-        )
-      ],
-      child: GitViewerLayout(),
+    return BaseView<BranchViewModel>(
+      onModelReady: (model) => model.fetchBranches(),
+      builder: (context, model, child) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider<GitViewerViewModel>(
+              create: (context) {
+                return GitViewerViewModel(branchList: model.branchList);
+              },
+            )
+          ],
+          child: model.busy?Container(): GitViewerLayout(),
+        );
+    }
     );
   }
 
@@ -75,6 +85,7 @@ class GitViewerLayout extends StatelessWidget {
           Container(
             height: 30,
             decoration: BoxDecoration(border: Border.all()),
+            child: BranchSelector(),
           ),
           Expanded(
             child: Container(
@@ -115,6 +126,40 @@ class GitViewerLayout extends StatelessWidget {
         )
     );
   }
+}
+
+class BranchSelector extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<GitViewerViewModel>(
+      builder: (BuildContext context, GitViewerViewModel model, Widget child){
+        GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
+        if(gitViewerViewModel.branchList!=null)
+          return dropDown(gitViewerViewModel.branchList, gitViewerViewModel.selectedBranch);
+        return Container();
+      },
+    );
+  }
+
+  Widget dropDown(List<BranchEntity> branchList, BranchEntity selectedBranch){
+    DropDownItemModel selectedItem;
+    List items = branchList.map((e) {
+      DropDownItemModel dropDownItemModel = DropDownItemModel(id: e, value: e.name, isDivider: false);
+      if(e == selectedBranch){
+        selectedItem = dropDownItemModel;
+      }
+      return dropDownItemModel;
+    } ).toList();
+    return Builder(
+      builder: (context) {
+        return DropDown(items: items, dropDownSelected: (e){
+          Provider.of<GitViewerViewModel>(context, listen: false).updateRootNode(e.id);
+        }, selection: selectedItem, color: Colors.black,);
+      }
+    );
+  }
+
+
 }
 
 class FilePathContainer extends StatelessWidget {

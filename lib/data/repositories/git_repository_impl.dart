@@ -45,16 +45,14 @@ class GitRepositoryImpl implements GitRepository{
   }
 
   @override
-  Future<Either<Failure, List<TreeNodeEntity>>> getParentNodes(BranchEntity branchEntity) async {
+  Future<Either<Failure, TreeNodeEntity>> getRootNode(BranchEntity branchEntity) async {
     try{
+      print("Fetching root node for "+branchEntity.name);
       CommitDetailModel commitDetailModel = await gitDataSource.getCommitDetail(branchEntity.commitId);
-      GithubTreeModel githubTreeModel = await gitDataSource.getGithubTree(commitDetailModel.tree.sha);
-      return Right(githubTreeModel.tree.map((e) {
-        TreeNodeEntity nodeEntity = TreeNodeEntity.from(e);
-        nodeEntity.path = nodeEntity.fileName;
-        nodeEntity.branch = branchEntity.name;
-        return nodeEntity;
-      }).toList());
+      GithubTreeModel githubTreeModel =commitDetailModel.tree;
+      TreeNodeEntity nodeEntity = TreeNodeEntity(id: githubTreeModel.sha, isLeafNode: false, fileName: 'digyed_reader');
+      nodeEntity.branch = branchEntity.name;
+      return Right(nodeEntity);
     } on ServerException{
       return Left(ServerFailure());
     }
@@ -64,6 +62,9 @@ class GitRepositoryImpl implements GitRepository{
   @override
   Future<Either<Failure, String>> getRawContent(TreeNodeEntity treeNodeEntity) async {
     try {
+      print("getRawContent");
+      print(treeNodeEntity.branch);
+      print(treeNodeEntity.path);
       String content =  await gitDataSource.getGitContent(
           treeNodeEntity.branch, treeNodeEntity.path);
       return Right(content);
