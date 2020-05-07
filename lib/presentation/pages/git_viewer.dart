@@ -16,16 +16,17 @@ class GitViewer extends StatelessWidget {
     return BaseView<BranchViewModel>(
       onModelReady: (model) => model.fetchBranches(),
       builder: (context, model, child) {
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider<GitViewerViewModel>(
-              create: (context) {
-                return GitViewerViewModel(branchList: model.branchList);
-              },
-            )
-          ],
-          child: model.busy?Container(): GitViewerLayout(),
-        );
+        return (model.busy)? Container(): GitViewerLayout(model.selectedBranch);
+//        return MultiProvider(
+//          providers: [
+//            ChangeNotifierProvider<GitViewerViewModel>(
+//              create: (context) {
+//                return GitViewerViewModel(branchList: model.branchList);
+//              },
+//            )
+//          ],
+//          child: model.busy?Container(): GitViewerLayout(),
+//        );
     }
     );
   }
@@ -34,32 +35,40 @@ class GitViewer extends StatelessWidget {
 
 
 class GitViewerLayout extends StatelessWidget {
+  BranchEntity branchEntity;
+  GitViewerLayout(this.branchEntity);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 30,
-              decoration: BoxDecoration(border: Border.all()),
-              child: topBar(),
+    return BaseView<GVViewModel>(
+        onModelReady: (model) => model.fetchRootNode(branchEntity),
+        builder: (context, model, child) {
+          return model.busy? Container() :
+          Container(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    height: 30,
+                    decoration: BoxDecoration(border: Border.all()),
+                    child: topBar(),
+                  ),
+                  Expanded(child: Row(
+                    children: <Widget>[
+                      fileExplorerLayout(),
+                      fileViewerLayout()
+                    ],
+                  ),),
+                  Container(
+                    height: 30,
+                    decoration: BoxDecoration(border: Border.all()),
+                  ),
+                ],
+              ),
             ),
-            Expanded(child: Row(
-              children: <Widget>[
-                fileExplorerLayout(),
-                fileViewerLayout()
-              ],
-            ),),
-            Container(
-              height: 30,
-              decoration: BoxDecoration(border: Border.all()),
-            ),
-          ],
-        ),
-      ),
+          );
+        }
     );
   }
 
@@ -69,7 +78,7 @@ class GitViewerLayout extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-          child: FilePathContainer(),
+          child: Container(), //FilePathContainer(),
         ),
       ],
     );
@@ -131,11 +140,11 @@ class GitViewerLayout extends StatelessWidget {
 class BranchSelector extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitViewerViewModel>(
-      builder: (BuildContext context, GitViewerViewModel model, Widget child){
-        GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
-        if(gitViewerViewModel.branchList!=null)
-          return dropDown(gitViewerViewModel.branchList, gitViewerViewModel.selectedBranch);
+    return Consumer<BranchViewModel>(
+      builder: (BuildContext context, BranchViewModel model, Widget child){
+        BranchViewModel model = Provider.of<BranchViewModel>(context);
+        if(model.branchList!=null)
+          return dropDown(model.branchList, model.selectedBranch);
         return Container();
       },
     );
@@ -153,7 +162,7 @@ class BranchSelector extends StatelessWidget{
     return Builder(
       builder: (context) {
         return DropDown(items: items, dropDownSelected: (e){
-          Provider.of<GitViewerViewModel>(context, listen: false).updateRootNode(e.id);
+//          Provider.of<GitViewerViewModel>(context, listen: false).updateRootNode(e.id);
         }, selection: selectedItem, color: Colors.black,);
       }
     );
@@ -165,32 +174,35 @@ class BranchSelector extends StatelessWidget{
 class FilePathContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitViewerViewModel>(
-      builder: (BuildContext context, GitViewerViewModel model, Widget child){
-        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
-        return selectedNode!=null ? Text(selectedNode.path): Container();
-      },
-    );
+    return Container();
+//    return Consumer<GitViewerViewModel>(
+//      builder: (BuildContext context, GitViewerViewModel model, Widget child){
+//        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
+//        return selectedNode!=null ? Text(selectedNode.path): Container();
+//      },
+//    );
   }
 }
 
 class FileViewerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitViewerViewModel>(
-      builder: (BuildContext context, GitViewerViewModel model, Widget child){
-        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
-        return selectedNode!=null ? FileViewer(selectedNode): Container();
-      },
-    );
+    return Container();
+//    return Consumer<GitViewerViewModel>(
+//      builder: (BuildContext context, GitViewerViewModel model, Widget child){
+//        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
+//        return selectedNode!=null ? FileViewer(selectedNode): Container();
+//      },
+//    );
   }
 }
 
 class FileExplorerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitViewerViewModel>(
-        builder: (BuildContext context, GitViewerViewModel model, Widget child){
+    //return Container();
+    return Consumer<GVViewModel>(
+        builder: (BuildContext context, GVViewModel model, Widget child){
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SingleChildScrollView(
@@ -205,44 +217,46 @@ class FileExplorerContainer extends StatelessWidget {
 class FileSelectionTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitViewerViewModel>(
-        builder: (BuildContext context, GitViewerViewModel model, Widget child){
-          
-          GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
-          List<TreeNodeEntity> treeNodeEntityList = gitViewerViewModel.nodesInViewer;
-          TreeNodeEntity selectedNode = gitViewerViewModel.selectedNode;
-          
-          return Row(
-            children: treeNodeEntityList.map((node){
-              return getTabButton(node, node==selectedNode);
-            }).toList(),
-          );
-        }
-    );
+    return Container();
+//    return Consumer<GitViewerViewModel>(
+//        builder: (BuildContext context, GitViewerViewModel model, Widget child){
+//
+//          GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
+//          List<TreeNodeEntity> treeNodeEntityList = gitViewerViewModel.nodesInViewer;
+//          TreeNodeEntity selectedNode = gitViewerViewModel.selectedNode;
+//
+//          return Row(
+//            children: treeNodeEntityList.map((node){
+//              return getTabButton(node, node==selectedNode);
+//            }).toList(),
+//          );
+//        }
+//    );
   }
 
   Widget getTabButton(TreeNodeEntity node, bool isSelected){
-    return Builder(builder: (context){
-      return Container(
-        decoration: BoxDecoration(border: Border.all(), color: isSelected?Colors.white : Colors.grey),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              InkWell(
-                  onTap: (){
-                    Provider.of<GitViewerViewModel>(context, listen: false).selectedNode = node;
-                  },
-                  child: Text(node.fileName)
-              ),
-              InkWell(child: Icon(Icons.cancel), onTap: (){
-                Provider.of<GitViewerViewModel>(context, listen: false).removeNode(node);
-              },)
-            ],),
-        ),
-      );
-    },);
+    return Container();
+//    return Builder(builder: (context){
+//      return Container(
+//        decoration: BoxDecoration(border: Border.all(), color: isSelected?Colors.white : Colors.grey),
+//        child: Padding(
+//          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+//          child: Row(
+//            mainAxisSize: MainAxisSize.min,
+//            children: <Widget>[
+//              InkWell(
+//                  onTap: (){
+//                    Provider.of<GitViewerViewModel>(context, listen: false).selectedNode = node;
+//                  },
+//                  child: Text(node.fileName)
+//              ),
+//              InkWell(child: Icon(Icons.cancel), onTap: (){
+//                Provider.of<GitViewerViewModel>(context, listen: false).removeNode(node);
+//              },)
+//            ],),
+//        ),
+//      );
+//    },);
   }
 
 }

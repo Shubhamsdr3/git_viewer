@@ -32,6 +32,8 @@ Future<void> init() async {
   // ViewModels
   sl.registerFactory(() => BranchViewModel());
   sl.registerFactory(() => FileViewerViewModel());
+  sl.registerFactory(() => FileExplorerViewModel());
+  sl.registerFactory(() => GVViewModel());
 
   // Use cases
   sl.registerLazySingleton(() => GetAllBranches(sl()));

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
-import 'package:git_viewer/presentation/bloc/folder_bloc/bloc.dart';
+import 'package:git_viewer/presentation/pages/base_view.dart';
 import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:provider/provider.dart';
-import '../../injection_container.dart' as di;
 
 
 typedef Function OnFileSelected(TreeNodeEntity filename);
@@ -19,41 +16,50 @@ class FileExplorer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => di.sl<FolderBloc>(),
-      child: BlocBuilder<FolderBloc, FolderState>(builder: (context, state) {
-        return Column(
+    return BaseView<FileExplorerViewModel>(
+      onModelReady: (model) {
+          model.nodeEntity = nodeEntity;
+        },
+      builder: (context, model, child){
+        return model.busy ? Center(child: CircularProgressIndicator()):
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: <Widget>[
             GestureDetector(
               onTap: () {
                 if(nodeEntity.isLeafNode) {
-                  Provider.of<GitViewerViewModel>(
-                      context, listen: false).addNode(nodeEntity);
+//                  Provider.of<GitViewerViewModel>(
+//                      context, listen: false).addNode(nodeEntity);
                   return;
                 }
-                if (!(state is Loading)) {
+                if (!(model.busy)) {
                   nodeEntity.isOpened = !nodeEntity.isOpened;
                   if (nodeEntity.isOpened) {
-                    BlocProvider.of<FolderBloc>(context)
-                        .add(GetSubFolderEvent(nodeEntity));
+                    model.fetchChildNode();
+                  }
+                  else{
+                    model.notifyListeners();
                   }
                 }
               },
-              child: row(state),
+              child: row(model.busy),
             ),
-            folderListWidget(state)
+            folderListWidget(model.busy)
           ],
         );
-      }),
+
+      },
+
     );
+
+
   }
 
-  Widget row(FolderState state) {
+  Widget row(bool isBusy) {
     bool isLeafNode = nodeEntity.isLeafNode;
     return Row(children: <Widget>[
-      state is Loading
+      isBusy
           ? SizedBox(width: 20,  height: 20, child: CircularProgressIndicator())
           : isLeafNode
               ? SizedBox(
@@ -71,9 +77,9 @@ class FileExplorer extends StatelessWidget {
     ]);
   }
 
-  Widget folderListWidget(state) {
+  Widget folderListWidget(bool isBusy) {
     List<dynamic> list = nodeEntity.treeNodeList;
-    if (!(state is Loaded) || !nodeEntity.isOpened || list == null) return Container();
+    if (isBusy || !nodeEntity.isOpened || list == null) return Container();
     return Padding(
       padding: const EdgeInsets.only(left: 16.0),
       child: Column(
