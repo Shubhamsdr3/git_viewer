@@ -90,17 +90,14 @@ class GitDataSourceImpl implements GitDataSource{
   Future<String> getGitContent(String branchName, String filePath) async {
     String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/' +
         branchName + filePath;
-    print(url);
     try {
       Function decoder = (String body) {
         return body;
       };
       String rawContent = await _fetchStringDataFromApi(url, decoder);
-      print(rawContent);
       return rawContent;
     }
     catch (e) {
-      print(e);
       return "Error Content";
     }
   }

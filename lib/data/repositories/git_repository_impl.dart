@@ -47,7 +47,6 @@ class GitRepositoryImpl implements GitRepository{
   @override
   Future<Either<Failure, TreeNodeEntity>> getRootNode(BranchEntity branchEntity) async {
     try{
-      print("Fetching root node for "+branchEntity.name);
       CommitDetailModel commitDetailModel = await gitDataSource.getCommitDetail(branchEntity.commitId);
       GithubTreeModel githubTreeModel =commitDetailModel.tree;
       TreeNodeEntity nodeEntity = TreeNodeEntity(id: githubTreeModel.sha, isLeafNode: false, fileName: 'digyed_reader');
@@ -62,9 +61,6 @@ class GitRepositoryImpl implements GitRepository{
   @override
   Future<Either<Failure, String>> getRawContent(TreeNodeEntity treeNodeEntity) async {
     try {
-      print("getRawContent");
-      print(treeNodeEntity.branch);
-      print(treeNodeEntity.path);
       String content =  await gitDataSource.getGitContent(
           treeNodeEntity.branch, treeNodeEntity.path);
       return Right(content);

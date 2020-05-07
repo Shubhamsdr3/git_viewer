@@ -89,6 +89,12 @@ class GVViewModel extends BaseViewModel{
   TreeNodeEntity _rootNode;
   TreeNodeEntity get selectedFile => _selectedFileNode;
 
+  set selectedFile(TreeNodeEntity _selectedFileNode){
+    this._selectedFileNode = _selectedFileNode;
+    notifyListeners();
+  }
+
+
 
   GVViewModel(){
     _nodesInTab = [];
@@ -107,6 +113,12 @@ class GVViewModel extends BaseViewModel{
       return;
     }
     _nodesInTab.remove(treeNodeEntity);
+
+    if(selectedFile != treeNodeEntity) {
+      notifyListeners();
+      return;
+    }
+
     if(_nodesInTab.length==0) {
       _selectedFileNode = null;
     }
@@ -121,16 +133,7 @@ class GVViewModel extends BaseViewModel{
 
   TreeNodeEntity get rootNode => _rootNode;
 
-//  TreeNodeEntity get rootNode {
-//    if (_rootNode ==null) {
-//      _rootNode = TreeNodeEntity(
-//          id: "071d621ea586b55a056b1dbe5175611a7994011e",
-//          fileName: "Root",
-//          isLeafNode: false);
-//      _rootNode.branch = "master";
-//    }
-//    return _rootNode;
-//  }
+  List<TreeNodeEntity> get nodesInTab => _nodesInTab;
 
   void fetchRootNode(BranchEntity branchEntity) async{
     (await gitRepository.getRootNode(branchEntity)).fold((l) => null, (r) {

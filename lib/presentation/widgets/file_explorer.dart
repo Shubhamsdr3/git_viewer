@@ -4,6 +4,7 @@ import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/presentation/pages/base_view.dart';
 import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
 
 typedef Function OnFileSelected(TreeNodeEntity filename);
@@ -21,16 +22,15 @@ class FileExplorer extends StatelessWidget {
           model.nodeEntity = nodeEntity;
         },
       builder: (context, model, child){
-        return model.busy ? Center(child: CircularProgressIndicator()):
-        Column(
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: <Widget>[
             GestureDetector(
               onTap: () {
                 if(nodeEntity.isLeafNode) {
-//                  Provider.of<GitViewerViewModel>(
-//                      context, listen: false).addNode(nodeEntity);
+                  Provider.of<GVViewModel>(
+                      context, listen: false).addNodeInTab(nodeEntity);
                   return;
                 }
                 if (!(model.busy)) {
@@ -57,11 +57,10 @@ class FileExplorer extends StatelessWidget {
   }
 
   Widget row(bool isBusy) {
-    bool isLeafNode = nodeEntity.isLeafNode;
     return Row(children: <Widget>[
       isBusy
           ? SizedBox(width: 20,  height: 20, child: CircularProgressIndicator())
-          : isLeafNode
+          : nodeEntity.isLeafNode
               ? SizedBox(
                   width: 20,
                   height: 20,

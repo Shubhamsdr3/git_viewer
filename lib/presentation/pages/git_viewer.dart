@@ -17,22 +17,11 @@ class GitViewer extends StatelessWidget {
       onModelReady: (model) => model.fetchBranches(),
       builder: (context, model, child) {
         return (model.busy)? Container(): GitViewerLayout(model.selectedBranch);
-//        return MultiProvider(
-//          providers: [
-//            ChangeNotifierProvider<GitViewerViewModel>(
-//              create: (context) {
-//                return GitViewerViewModel(branchList: model.branchList);
-//              },
-//            )
-//          ],
-//          child: model.busy?Container(): GitViewerLayout(),
-//        );
     }
     );
   }
 
 }
-
 
 class GitViewerLayout extends StatelessWidget {
   BranchEntity branchEntity;
@@ -78,7 +67,7 @@ class GitViewerLayout extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-          child: Container(), //FilePathContainer(),
+          child: FilePathContainer(),
         ),
       ],
     );
@@ -174,26 +163,18 @@ class BranchSelector extends StatelessWidget{
 class FilePathContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
-//    return Consumer<GitViewerViewModel>(
-//      builder: (BuildContext context, GitViewerViewModel model, Widget child){
-//        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
-//        return selectedNode!=null ? Text(selectedNode.path): Container();
-//      },
-//    );
+    TreeNodeEntity selectedNode = Provider
+        .of<GVViewModel>(context)
+        .selectedFile;
+    return selectedNode != null ? Text(selectedNode.path) : Container();
   }
 }
 
 class FileViewerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
-//    return Consumer<GitViewerViewModel>(
-//      builder: (BuildContext context, GitViewerViewModel model, Widget child){
-//        TreeNodeEntity selectedNode = Provider.of<GitViewerViewModel>(context).selectedNode;
-//        return selectedNode!=null ? FileViewer(selectedNode): Container();
-//      },
-//    );
+        TreeNodeEntity selectedFile = Provider.of<GVViewModel>(context).selectedFile;
+        return selectedFile!=null ? FileViewer(selectedFile): Container();
   }
 }
 
@@ -201,15 +182,14 @@ class FileExplorerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //return Container();
-    return Consumer<GVViewModel>(
-        builder: (BuildContext context, GVViewModel model, Widget child){
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: FileExplorer(nodeEntity: model.rootNode)),
-          );
-        },
+    TreeNodeEntity rootNode = Provider.of<GVViewModel>(context).rootNode;
+    if(rootNode==null)
+      return Container();
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: FileExplorer(nodeEntity: rootNode)),
     );
   }
 }
@@ -217,46 +197,39 @@ class FileExplorerContainer extends StatelessWidget {
 class FileSelectionTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
-//    return Consumer<GitViewerViewModel>(
-//        builder: (BuildContext context, GitViewerViewModel model, Widget child){
-//
-//          GitViewerViewModel gitViewerViewModel = Provider.of<GitViewerViewModel>(context);
-//          List<TreeNodeEntity> treeNodeEntityList = gitViewerViewModel.nodesInViewer;
-//          TreeNodeEntity selectedNode = gitViewerViewModel.selectedNode;
-//
-//          return Row(
-//            children: treeNodeEntityList.map((node){
-//              return getTabButton(node, node==selectedNode);
-//            }).toList(),
-//          );
-//        }
-//    );
-  }
+          GVViewModel gitViewerViewModel = Provider.of<GVViewModel>(context);
+          List<TreeNodeEntity> treeNodeEntityList = gitViewerViewModel.nodesInTab;
+          TreeNodeEntity selectedNode = gitViewerViewModel.selectedFile;
+          return Row(
+            children: treeNodeEntityList.map((node){
+              return getTabButton(node, node==selectedNode);
+            }).toList(),
+          );
+        }
 
   Widget getTabButton(TreeNodeEntity node, bool isSelected){
-    return Container();
-//    return Builder(builder: (context){
-//      return Container(
-//        decoration: BoxDecoration(border: Border.all(), color: isSelected?Colors.white : Colors.grey),
-//        child: Padding(
-//          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-//          child: Row(
-//            mainAxisSize: MainAxisSize.min,
-//            children: <Widget>[
-//              InkWell(
-//                  onTap: (){
-//                    Provider.of<GitViewerViewModel>(context, listen: false).selectedNode = node;
-//                  },
-//                  child: Text(node.fileName)
-//              ),
-//              InkWell(child: Icon(Icons.cancel), onTap: (){
-//                Provider.of<GitViewerViewModel>(context, listen: false).removeNode(node);
-//              },)
-//            ],),
-//        ),
-//      );
-//    },);
+    return Builder(builder: (context){
+      return Container(
+        decoration: BoxDecoration(border: Border.all(), color: isSelected?Colors.white : Colors.grey),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              InkWell(
+                  onTap: (){
+                    print("on tap");
+                    Provider.of<GVViewModel>(context, listen: false).selectedFile = node;
+                  },
+                  child: Text(node.fileName)
+              ),
+              InkWell(child: Icon(Icons.cancel), onTap: (){
+                Provider.of<GVViewModel>(context, listen: false).removeNodeFromTab(node);
+              },)
+            ],),
+        ),
+      );
+    },);
   }
 
 }
