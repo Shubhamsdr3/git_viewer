@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'data/datasources/git_data_source.dart';
 import 'data/repositories/git_repository_impl.dart';
 import 'domain/repositories/git_repository.dart';
+import 'domain/services/dialog_service.dart';
 
 
 final sl = GetIt.instance;
@@ -16,6 +17,9 @@ Future<void> init() async {
   sl.registerFactory(() => FileViewerViewModel());
   sl.registerFactory(() => FileExplorerViewModel());
   sl.registerFactory(() => GVViewModel());
+
+  // Services
+  sl.registerLazySingleton(() => DialogService());
 
   // Repository
   sl.registerLazySingleton<GitRepository>(

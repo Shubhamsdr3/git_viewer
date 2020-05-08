@@ -36,7 +36,7 @@ dependencies:
   meta: ^1.1.8
   material_design_icons_flutter: ^4.0.5145
   provider:
-
+  rflutter_alert: ^1.0.2
 
 
 

@@ -69,7 +69,22 @@ class GitViewerLayout extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4.0, right: 4.0),
           child: FilePathContainer(),
         ),
+        Expanded(child: Container(),),
+        changRepoButton()
       ],
+    );
+  }
+
+  Widget changRepoButton(){
+    return Builder(
+      builder: (context) {
+        return MaterialButton(
+          child: Text('Switch Repository'),
+          onPressed: (){
+            Provider.of<BranchViewModel>(context, listen: false).doThings();
+          },
+        );
+      }
     );
   }
 

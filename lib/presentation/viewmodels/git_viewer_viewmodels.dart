@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:git_viewer/core/error/failures.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/domain/repositories/git_repository.dart';
+import 'package:git_viewer/domain/services/dialog_service.dart';
 
 import '../../injection_container.dart';
 import 'base_view_model.dart';
@@ -10,6 +11,7 @@ import 'base_view_model.dart';
 
 class BranchViewModel extends BaseViewModel{
   GitRepository gitRepository = sl<GitRepository>();
+  final DialogService _dialogService = sl<DialogService>();
 
   List<BranchEntity> _branchList;
   BranchEntity _selectedBranch;
@@ -26,6 +28,19 @@ class BranchViewModel extends BaseViewModel{
     });
     setBusy(false);
   }
+
+  Future doThings() async {
+    print('dialog shown');
+    var dialogResult = await _dialogService.showGitRepoChangeDialog();
+    if (dialogResult.confirmed) {
+      print('User has confirmed');
+    } else {
+      print('User cancelled the dialog');
+    }
+  }
+
+
+
 
   BranchEntity get selectedBranch => _selectedBranch;
 
