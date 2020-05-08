@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:git_viewer/data/models/dialog_models.dart';
 import 'package:git_viewer/domain/services/dialog_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -41,33 +42,11 @@ class _DialogManagerState extends State<DialogManager> {
   Alert getChangeGitRepoDialog(){
     return Alert(
         context: context,
-        title: "LOGIN",
-        content: Column(
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(
-                icon: Icon(Icons.account_circle),
-                labelText: 'Username',
-              ),
-            ),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                icon: Icon(Icons.lock),
-                labelText: 'Password',
-              ),
-            ),
-          ],
-        ),
-        buttons: [
-          DialogButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              "LOGIN",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ]);
+        title: "Add Git Project Detail",
+        content: GitRepoChangeDialog(_dialogService),
+        buttons: []
+
+    );
   }
 
   Alert getAlertDialog(AlertRequest request){
@@ -87,5 +66,90 @@ class _DialogManagerState extends State<DialogManager> {
           )
         ]);
   }
-
 }
+
+
+class GitRepoChangeDialog extends StatefulWidget {
+  DialogService dialogService;
+  GitRepoChangeDialog(this.dialogService);
+
+  @override
+  _GitRepoChangeDialogState createState() => _GitRepoChangeDialogState();
+}
+
+class _GitRepoChangeDialogState extends State<GitRepoChangeDialog> {
+
+  TextEditingController _userNameController;
+  TextEditingController _projectNameController;
+  GlobalKey<FormState> _formKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _userNameController = TextEditingController();
+    _projectNameController = TextEditingController();
+    _formKey = GlobalKey<FormState>();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _userNameController.dispose();
+    _projectNameController.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            controller: _userNameController,
+            decoration: InputDecoration(
+              icon: Icon(Icons.account_circle),
+              labelText: 'User Name',
+            ),
+            validator: (value){
+              if(value.isEmpty){
+                return 'Please enter user name';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: _projectNameController,
+            obscureText: true,
+            decoration: InputDecoration(
+              icon: Icon(Icons.lock),
+              labelText: 'Project Name',
+            ),
+            validator: (value){
+              if(value.isEmpty){
+                return 'Please enter project name';
+              }
+              return null;
+            },
+          ),
+          RaisedButton(
+            child: Text("Submit"),
+            onPressed: (){
+              if (_formKey.currentState.validate()) {
+                widget.dialogService.dialogComplete(ChangeGitRepoResponse(
+                    userName: _userNameController.text,
+                    projectName: _projectNameController.text,
+                    confirmed: true
+                ));
+                Navigator.of(context).pop();
+              }
+            },
+          )
+
+        ],
+      ),
+    );
+  }
+}
+
+

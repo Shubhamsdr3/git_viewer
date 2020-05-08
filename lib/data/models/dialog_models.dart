@@ -37,12 +37,12 @@ class AlertResponse extends DialogResponse{
 class ChangeGitRepoRequest extends DialogRequest {
 }
 
-class ChangeGitResponse extends DialogResponse{
+class ChangeGitRepoResponse extends DialogResponse{
   final String userName;
   final String projectName;
   final bool confirmed;
 
-  ChangeGitResponse({
+  ChangeGitRepoResponse({
     this.userName,
     this.projectName,
     this.confirmed,

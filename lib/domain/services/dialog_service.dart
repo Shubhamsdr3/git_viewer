@@ -11,7 +11,7 @@ class DialogService {
     _showDialogListener = showDialogListener;
   }
 
-  Future<AlertResponse> showDialog(
+  Future<DialogResponse> showDialog(
       {String title, String description, String buttonTitle = 'OK'}) {
     _dialogCompleter = Completer<AlertResponse>();
     _showDialogListener(AlertRequest(
@@ -22,8 +22,8 @@ class DialogService {
     return _dialogCompleter.future;
   }
 
-  Future<AlertResponse> showGitRepoChangeDialog() {
-    _dialogCompleter = Completer<AlertResponse>();
+  Future<ChangeGitRepoResponse> showGitRepoChangeDialog() {
+    _dialogCompleter = Completer<ChangeGitRepoResponse>();
     _showDialogListener(ChangeGitRepoRequest());
     return _dialogCompleter.future;
   }
