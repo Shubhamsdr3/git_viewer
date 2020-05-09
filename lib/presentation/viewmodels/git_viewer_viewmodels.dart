@@ -9,6 +9,45 @@ import 'package:git_viewer/domain/services/dialog_service.dart';
 import '../../injection_container.dart';
 import 'base_view_model.dart';
 
+class HomeViewModel extends BaseViewModel{
+
+  final DialogService _dialogService = sl<DialogService>();
+  GitRepository gitRepository = sl<GitRepository>();
+  
+  List<ProjectEntity> _projectList = [];
+
+  Future getProjectList() async{
+    setBusy(true);
+    (await gitRepository.getProjectEntityList()).fold(
+        (l) {
+          print("Cache Failure");
+        },
+        (r) {
+          _projectList = r;
+          print("getProjectList");
+          print(_projectList);
+        }
+    );
+    setBusy(false);
+  }
+
+  Future addProject() async {
+    setBusy(true);
+    var dialogResult = await _dialogService.showGitRepoChangeDialog();
+    if (dialogResult.confirmed) {
+      var entity = ProjectEntity(userName: dialogResult.userName, projectName: dialogResult.projectName);
+      if(!_projectList.contains(entity)) {
+        _projectList.add(entity);
+        (await gitRepository.saveProjectEntityList(_projectList));
+      }
+    }
+    setBusy(false);
+  }
+  
+
+  List<ProjectEntity> get projectList => _projectList;
+
+}
 
 class BranchViewModel extends BaseViewModel{
   GitRepository gitRepository = sl<GitRepository>();
@@ -19,12 +58,9 @@ class BranchViewModel extends BaseViewModel{
   BranchEntity _selectedBranch;
   List<BranchEntity> get branchList => _branchList;
 
-  Future updateGitRepo(String userName, String projectName) async {
-    gitDataSource.updateGitInfo(userName, projectName);
-    fetchBranches();
-  }
-
-  Future fetchBranches() async {
+  Future fetchBranches(ProjectEntity projectEntity) async {
+    gitDataSource.updateGitInfo(projectEntity.userName,
+        projectEntity.projectName);
     setBusy(true);
     final failureOrBranches = await gitRepository.getAllBranches();
     failureOrBranches.fold((l)  {
@@ -39,7 +75,7 @@ class BranchViewModel extends BaseViewModel{
   Future doThings() async {
     var dialogResult = await _dialogService.showGitRepoChangeDialog();
     if (dialogResult.confirmed) {
-      updateGitRepo(dialogResult.userName, dialogResult.projectName);
+      fetchBranches(ProjectEntity(userName: dialogResult.userName, projectName: dialogResult.projectName));
     } else {
       print('User cancelled the dialog');
     }
@@ -52,6 +88,7 @@ class BranchViewModel extends BaseViewModel{
 
   set selectedBranch(BranchEntity branchEntity){
     _selectedBranch =  branchEntity;
+    notifyListeners();
   }
 
 

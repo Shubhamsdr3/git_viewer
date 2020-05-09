@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:git_viewer/presentation/manager/local_storage_manager.dart';
 import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,11 +13,16 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
 
+  // Manager
+  var instance = await LocalStorageManager.getInstance();
+  sl.registerSingleton<LocalStorageManager>(instance);
+
   // ViewModels
   sl.registerFactory(() => BranchViewModel());
   sl.registerFactory(() => FileViewerViewModel());
   sl.registerFactory(() => FileExplorerViewModel());
   sl.registerFactory(() => GVViewModel());
+  sl.registerFactory(() => HomeViewModel());
 
   // Services
   sl.registerLazySingleton(() => DialogService());
@@ -25,6 +31,7 @@ Future<void> init() async {
   sl.registerLazySingleton<GitRepository>(
     () => GitRepositoryImpl(
       gitDataSource: sl(),
+      localStorageManager: sl()
     ),
   );
 

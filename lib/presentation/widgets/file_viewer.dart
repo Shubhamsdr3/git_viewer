@@ -12,11 +12,16 @@ class FileViewer extends StatelessWidget {
     return BaseView<FileViewerViewModel>(
       onModelReady: (model) => model.fetchContent(nodeEntity),
       builder: (context, model, child){
+        TextEditingController textEditingController = model.busy? TextEditingController():
+        TextEditingController(text: model.content);
         return model.busy ? Center(child: CircularProgressIndicator()):
         SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            child: SelectableText(model.content),
+            child: TextField(
+                enabled: false,
+                controller: textEditingController
+            ),
           ),
         );
       },

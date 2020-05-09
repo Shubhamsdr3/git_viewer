@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:git_viewer/data/models/dialog_models.dart';
 import 'package:git_viewer/domain/services/dialog_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -120,7 +119,6 @@ class _GitRepoChangeDialogState extends State<GitRepoChangeDialog> {
           ),
           TextFormField(
             controller: _projectNameController,
-            obscureText: true,
             decoration: InputDecoration(
               icon: Icon(Icons.lock),
               labelText: 'Project Name',

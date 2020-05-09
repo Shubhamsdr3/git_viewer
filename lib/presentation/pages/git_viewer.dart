@@ -7,17 +7,24 @@ import 'package:git_viewer/presentation/widgets/drop_down.dart';
 import 'package:git_viewer/presentation/widgets/file_explorer.dart';
 import 'package:git_viewer/presentation/widgets/file_viewer.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'base_view.dart';
 
 class GitViewer extends StatelessWidget {
+  final ProjectEntity projectEntity;
+  GitViewer(this.projectEntity);
+
   @override
   Widget build(BuildContext context) {
-    return BaseView<BranchViewModel>(
-      onModelReady: (model) => model.fetchBranches(),
-      builder: (context, model, child) {
-        return (model.busy)? Container(): GitViewerLayout(model.selectedBranch);
-    }
+    print(projectEntity.userName);
+    return Scaffold(
+      body: BaseView<BranchViewModel>(
+        onModelReady: (model) => model.fetchBranches(projectEntity),
+        builder: (context, model, child) {
+          return (model.busy)? Container(): GitViewerLayout(model.selectedBranch);
+      }
+      ),
     );
   }
 
@@ -166,7 +173,7 @@ class BranchSelector extends StatelessWidget{
     return Builder(
       builder: (context) {
         return DropDown(items: items, dropDownSelected: (e){
-//          Provider.of<GitViewerViewModel>(context, listen: false).updateRootNode(e.id);
+          Provider.of<BranchViewModel>(context, listen: false).selectedBranch = e.id;
         }, selection: selectedItem, color: Colors.black,);
       }
     );
@@ -181,7 +188,19 @@ class FilePathContainer extends StatelessWidget {
     TreeNodeEntity selectedNode = Provider
         .of<GVViewModel>(context)
         .selectedFile;
-    return selectedNode != null ? Text(selectedNode.path) : Container();
+
+    return selectedNode == null ? Container():
+    GestureDetector(
+        child: Text(selectedNode.path, style: TextStyle(color: Colors.blue,),),
+        onTap: () async{
+          String url = selectedNode.url;
+          if (await canLaunch(url)) {
+          await launch(url);
+          } else {
+          throw 'Could not launch $url';
+          }
+        },
+    );
   }
 }
 

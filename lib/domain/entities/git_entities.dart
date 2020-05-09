@@ -1,5 +1,22 @@
 import 'package:equatable/equatable.dart';
 import 'package:git_viewer/data/models/git_models.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'git_entities.g.dart';
+
+@JsonSerializable()
+class ProjectEntity extends Equatable{
+  final String userName;
+  final String projectName;
+
+  ProjectEntity({this.userName, this.projectName});
+
+  factory ProjectEntity.fromJson(Map<String, dynamic> json) => _$ProjectEntityFromJson(json);
+  Map<String, dynamic> toJson() => _$ProjectEntityToJson(this);
+
+  @override
+  List<Object> get props => [userName, projectName];
+}
 
 class BranchEntity extends Equatable {
   String name;
@@ -25,6 +42,13 @@ class TreeNodeEntity extends Equatable{
   bool _isOpened = false;
   String _path;
   String _branch;
+  String _url;
+
+  String get url => _url;
+
+  set url(String value) {
+    _url = value;
+  }
 
   List<TreeNodeEntity> _treeNodeList;
 

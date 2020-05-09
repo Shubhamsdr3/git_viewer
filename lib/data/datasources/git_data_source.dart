@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 
 import 'package:git_viewer/core/error/exceptions.dart';
@@ -7,25 +8,41 @@ import 'package:meta/meta.dart';
 
 
 abstract class GitDataSource {
-  String baseUrl = 'https://api.github.com/repos/manishag777/digyed_reader';
 
-  void updateGitInfo(String userName, String projectName){
-    baseUrl = 'https://api.github.com/repos/$userName/$projectName';
-  }
+  String userName;
+  String projectName;
+  void updateGitInfo(String userName, String projectName);
 
   Future<List<BranchModel>> getAllBranches();
   Future<CommitDetailModel> getCommitDetail(String commitId);
   Future<GithubTreeModel> getGithubTree(String parentTreeId);
   Future<String> getGitContent(String branchName, String filePath);
+  String getGitRootUrl();
 }
 
 class GitDataSourceImpl implements GitDataSource{
 
+  @override
+  String projectName = 'digyed_reader';
+
+  @override
+  String userName = 'manishag777';
+
+  String baseUrl = 'https://api.github.com/repos/manishag777/digyed_reader';
+  String contentUrl = 'https://raw.githubusercontent.com/manishag777/digyed_reader';
 
   void updateGitInfo(String userName, String projectName){
+    this.userName=userName;
+    this.projectName=projectName;
     baseUrl = 'https://api.github.com/repos/$userName/$projectName';
+    contentUrl = 'https://raw.githubusercontent.com/$userName/$projectName';
   }
-  
+
+  @override
+  String getGitRootUrl() {
+    return "https://github.com/$userName/$projectName/blob";
+  }
+
   final http.Client client;
 
   GitDataSourceImpl({@required this.client});
@@ -70,7 +87,6 @@ class GitDataSourceImpl implements GitDataSource{
   @override
   Future<List<BranchModel>> getAllBranches() async{
     String url = baseUrl+ "/branches";
-    print(url);
     Function decoder = (String body) {
       List<dynamic> _branchModelList = json.decode(body);
       return _branchModelList.map((b) => BranchModel.fromJson(b)).toList();
@@ -90,7 +106,6 @@ class GitDataSourceImpl implements GitDataSource{
   @override
   Future<GithubTreeModel> getGithubTree(String parentTreeId) async{
     String url = baseUrl+"/git/trees/"+parentTreeId;
-    print(url);
     Function decoder = (String body){
       return GithubTreeModel.fromJson(json.decode(body));
     };
@@ -100,9 +115,7 @@ class GitDataSourceImpl implements GitDataSource{
 
   @override
   Future<String> getGitContent(String branchName, String filePath) async {
-    String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/' +
-        branchName + filePath;
-    print(url);
+    String url = contentUrl + '/' + branchName + filePath;
     try {
       Function decoder = (String body) {
         return body;
@@ -115,6 +128,5 @@ class GitDataSourceImpl implements GitDataSource{
     }
   }
 
-  @override
-  String baseUrl;
+
 }

@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter/widgets.dart';
 import 'package:git_viewer/core/error/exceptions.dart';
@@ -7,12 +9,20 @@ import 'package:git_viewer/data/datasources/git_data_source.dart';
 import 'package:git_viewer/data/models/git_models.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/domain/repositories/git_repository.dart';
+import 'package:git_viewer/presentation/manager/local_storage_manager.dart';
+
+
+// Cache constants
+
+final String PROJECT_ENTITY_LIST_KEY = 'project_entity_list';
+
 
 class GitRepositoryImpl implements GitRepository{
 
   final GitDataSource gitDataSource;
+  final LocalStorageManager localStorageManager;
 
-  GitRepositoryImpl({@required this.gitDataSource});
+  GitRepositoryImpl({@required this.gitDataSource, @required this.localStorageManager});
 
 
   @override
@@ -36,6 +46,7 @@ class GitRepositoryImpl implements GitRepository{
         TreeNodeEntity nodeEntity = TreeNodeEntity.from(e);
         nodeEntity.path = (treeNodeEntity.path??"") + "/"+ nodeEntity.fileName;
         nodeEntity.branch = treeNodeEntity.branch;
+        nodeEntity.url = gitDataSource.getGitRootUrl() +"/"+treeNodeEntity.branch+nodeEntity.path;
         return nodeEntity;
       }).toList());
     } on ServerException{
@@ -49,7 +60,7 @@ class GitRepositoryImpl implements GitRepository{
     try{
       CommitDetailModel commitDetailModel = await gitDataSource.getCommitDetail(branchEntity.commitId);
       GithubTreeModel githubTreeModel =commitDetailModel.tree;
-      TreeNodeEntity nodeEntity = TreeNodeEntity(id: githubTreeModel.sha, isLeafNode: false, fileName: 'digyed_reader');
+      TreeNodeEntity nodeEntity = TreeNodeEntity(id: githubTreeModel.sha, isLeafNode: false, fileName: gitDataSource.projectName);
       nodeEntity.branch = branchEntity.name;
       return Right(nodeEntity);
     } on ServerException{
@@ -68,6 +79,31 @@ class GitRepositoryImpl implements GitRepository{
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, List<ProjectEntity>>> getProjectEntityList() async {
+    try {
+      List<dynamic> list = localStorageManager.getFromDisk(PROJECT_ENTITY_LIST_KEY);
+      List<ProjectEntity> list2 = list.map((e) => ProjectEntity.fromJson(json.decode(e))).toList();
+      return Right(list2);
+    } catch (e){
+      return Left(CacheFailure());
+    }
+
+  }
+
+  @override
+  Future<Either<Failure, Unit>> saveProjectEntityList(List<ProjectEntity> projectEntityList) async {
+    try {
+      localStorageManager.saveToDisk(PROJECT_ENTITY_LIST_KEY,
+          projectEntityList.map((e) => json.encode(e.toJson())).toList());
+      return Right(unit);
+    }
+    catch(e){
+      return Left(CacheFailure());
+    }
+  }
+
 
 
 }
