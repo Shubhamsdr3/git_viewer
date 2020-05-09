@@ -7,6 +7,12 @@ import 'package:meta/meta.dart';
 
 
 abstract class GitDataSource {
+  String baseUrl = 'https://api.github.com/repos/manishag777/digyed_reader';
+
+  void updateGitInfo(String userName, String projectName){
+    baseUrl = 'https://api.github.com/repos/$userName/$projectName';
+  }
+
   Future<List<BranchModel>> getAllBranches();
   Future<CommitDetailModel> getCommitDetail(String commitId);
   Future<GithubTreeModel> getGithubTree(String parentTreeId);
@@ -14,8 +20,12 @@ abstract class GitDataSource {
 }
 
 class GitDataSourceImpl implements GitDataSource{
-  final String baseUrl = 'https://api.github.com/repos/manishag777/digyed_reader';
 
+
+  void updateGitInfo(String userName, String projectName){
+    baseUrl = 'https://api.github.com/repos/$userName/$projectName';
+  }
+  
   final http.Client client;
 
   GitDataSourceImpl({@required this.client});
@@ -60,6 +70,7 @@ class GitDataSourceImpl implements GitDataSource{
   @override
   Future<List<BranchModel>> getAllBranches() async{
     String url = baseUrl+ "/branches";
+    print(url);
     Function decoder = (String body) {
       List<dynamic> _branchModelList = json.decode(body);
       return _branchModelList.map((b) => BranchModel.fromJson(b)).toList();
@@ -79,6 +90,7 @@ class GitDataSourceImpl implements GitDataSource{
   @override
   Future<GithubTreeModel> getGithubTree(String parentTreeId) async{
     String url = baseUrl+"/git/trees/"+parentTreeId;
+    print(url);
     Function decoder = (String body){
       return GithubTreeModel.fromJson(json.decode(body));
     };
@@ -90,6 +102,7 @@ class GitDataSourceImpl implements GitDataSource{
   Future<String> getGitContent(String branchName, String filePath) async {
     String url = 'https://raw.githubusercontent.com/manishag777/digyed_reader/' +
         branchName + filePath;
+    print(url);
     try {
       Function decoder = (String body) {
         return body;
@@ -101,4 +114,7 @@ class GitDataSourceImpl implements GitDataSource{
       return "Error Content";
     }
   }
+
+  @override
+  String baseUrl;
 }

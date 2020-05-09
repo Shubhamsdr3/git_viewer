@@ -55,12 +55,12 @@ class _DialogManagerState extends State<DialogManager> {
         title: request.title,
         desc: request.description,
         closeFunction: () =>
-            _dialogService.dialogComplete(AlertResponse(confirmed: false)),
+            _dialogService.dialogComplete(ChangeGitRepoResponse(confirmed: false)),
         buttons: [
           DialogButton(
             child: Text(request.buttonTitle),
             onPressed: () {
-              _dialogService.dialogComplete(AlertResponse(confirmed: true));
+              _dialogService.dialogComplete(ChangeGitRepoResponse(confirmed: true));
               Navigator.of(context).pop();
             },
           )
