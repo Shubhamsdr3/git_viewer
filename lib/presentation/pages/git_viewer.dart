@@ -6,6 +6,7 @@ import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
 import 'package:git_viewer/presentation/widgets/drop_down.dart';
 import 'package:git_viewer/presentation/widgets/file_explorer.dart';
 import 'package:git_viewer/presentation/widgets/file_viewer.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -85,11 +86,18 @@ class GitViewerLayout extends StatelessWidget {
   Widget changRepoButton(){
     return Builder(
       builder: (context) {
-        return MaterialButton(
-          child: Text('Switch Repository'),
-          onPressed: (){
-            Provider.of<BranchViewModel>(context, listen: false).doThings();
-          },
+        var projectEntity = Provider.of<BranchViewModel>(context).projectEntity;
+        return Tooltip(
+          message: "Change Repo",
+          child: RaisedButton(
+            child: Row(children: <Widget>[
+              Icon(MdiIcons.infinity),
+              Text(projectEntity.userName+"/"+projectEntity.projectName)
+            ],),
+            onPressed: (){
+                Navigator.pop(context);
+            },
+          ),
         );
       }
     );

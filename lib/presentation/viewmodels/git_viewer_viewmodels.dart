@@ -52,13 +52,15 @@ class HomeViewModel extends BaseViewModel{
 class BranchViewModel extends BaseViewModel{
   GitRepository gitRepository = sl<GitRepository>();
   GitDataSource gitDataSource = sl<GitDataSource>();
-  final DialogService _dialogService = sl<DialogService>();
 
   List<BranchEntity> _branchList;
+  ProjectEntity _projectEntity;
   BranchEntity _selectedBranch;
   List<BranchEntity> get branchList => _branchList;
+  ProjectEntity get projectEntity => _projectEntity;
 
   Future fetchBranches(ProjectEntity projectEntity) async {
+    _projectEntity = projectEntity;
     gitDataSource.updateGitInfo(projectEntity.userName,
         projectEntity.projectName);
     setBusy(true);
@@ -71,18 +73,6 @@ class BranchViewModel extends BaseViewModel{
     });
     setBusy(false);
   }
-
-  Future doThings() async {
-    var dialogResult = await _dialogService.showGitRepoChangeDialog();
-    if (dialogResult.confirmed) {
-      fetchBranches(ProjectEntity(userName: dialogResult.userName, projectName: dialogResult.projectName));
-    } else {
-      print('User cancelled the dialog');
-    }
-  }
-
-
-
 
   BranchEntity get selectedBranch => _selectedBranch;
 
