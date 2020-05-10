@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:git_viewer/presentation/manager/dialog_manager.dart';
 import 'package:git_viewer/router.dart';
 
+import 'domain/services/navigation_service.dart';
 import 'injection_container.dart' as di;
+import 'injection_container.dart';
 
 
 void main() async{
@@ -27,7 +29,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       onGenerateRoute: Router.generateRoute,
-      initialRoute: initialRoute,
+      initialRoute: InitialRoute,
+      navigatorKey: sl<NavigationService>().navigationKey,
     );
   }
 }

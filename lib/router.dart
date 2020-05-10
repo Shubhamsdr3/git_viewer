@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:git_viewer/presentation/pages/git_viewer.dart';
 import 'package:git_viewer/presentation/pages/home_view.dart';
+import 'package:git_viewer/presentation/pages/login_view.dart';
 
 const String HomeRoute = "/";
 const String ViewerRoute = "/viewer";
-const String initialRoute = HomeRoute;
+const String LoginViewRoute = "/login";
+const String InitialRoute = LoginViewRoute;
+
 
 class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case LoginViewRoute:
+        return MaterialPageRoute(builder: (_) => LoginView());
+
+
       case HomeRoute:
         return MaterialPageRoute(builder: (_) => HomeView());
 
