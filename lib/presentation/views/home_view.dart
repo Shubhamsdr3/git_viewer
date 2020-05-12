@@ -1,11 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:git_viewer/domain/entities/git_entities.dart';
-import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
+import 'package:git_viewer/presentation/viewmodels/home_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../router.dart';
-import 'base_view.dart';
+import 'package:git_viewer/core/views/base_view.dart';
 
 class HomeView extends StatelessWidget {
   @override

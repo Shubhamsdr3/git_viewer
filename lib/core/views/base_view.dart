@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:git_viewer/presentation/viewmodels/base_view_model.dart';
+import 'package:git_viewer/core/viewmodels/base_view_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../injection_container.dart';

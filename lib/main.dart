@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:git_viewer/presentation/manager/dialog_manager.dart';
 import 'package:git_viewer/router.dart';
 
 import 'injection_container.dart' as di;
@@ -17,12 +16,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      builder: (context, widget) => Navigator(
-        onGenerateRoute: (settings) => MaterialPageRoute(
-            builder: (context) => DialogManager(
-              child: widget,
-            )),
-      ),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

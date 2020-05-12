@@ -3,13 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // References: https://www.filledstacks.com/snippet/shared-preferences-service-in-flutter-for-code-maintainability/
 
-class LocalStorageManager {
-  static LocalStorageManager _instance;
+class LocalStorageUtil {
+  static LocalStorageUtil _instance;
   static SharedPreferences _preferences;
 
-  static Future<LocalStorageManager> getInstance() async {
+  static Future<LocalStorageUtil> getInstance() async {
     if (_instance == null) {
-      _instance = LocalStorageManager();
+      _instance = LocalStorageUtil();
     }
 
     if (_preferences == null) {
@@ -21,7 +21,6 @@ class LocalStorageManager {
 
   // updated _saveToDisk function that handles all types
   void saveToDisk<T>(String key, T content){
-    print('(TRACE) LocalStorageService:_saveToDisk. key: $key value: $content');
     print(content.runtimeType);
     if(content is String) {
       _preferences.setString(key, content);
@@ -36,7 +35,6 @@ class LocalStorageManager {
       _preferences.setDouble(key, content);
     }
     if(content is List<String>) {
-      print('List<String>');
       _preferences.setStringList(key, content);
     }
 
@@ -44,7 +42,6 @@ class LocalStorageManager {
 
   dynamic getFromDisk(String key) {
     var value  = _preferences.get(key);
-    print('(TRACE) LocalStorageService:_getFromDisk. key: $key value: $value');
     return value;
   }
 

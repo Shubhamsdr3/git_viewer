@@ -9,7 +9,7 @@ import 'package:git_viewer/data/datasources/git_data_source.dart';
 import 'package:git_viewer/data/models/git_models.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/domain/repositories/git_repository.dart';
-import 'package:git_viewer/presentation/manager/local_storage_manager.dart';
+import 'package:git_viewer/core/util/local_storage_util.dart';
 
 
 // Cache constants
@@ -20,7 +20,7 @@ final String PROJECT_ENTITY_LIST_KEY = 'project_entity_list';
 class GitRepositoryImpl implements GitRepository{
 
   final GitDataSource gitDataSource;
-  final LocalStorageManager localStorageManager;
+  final LocalStorageUtil localStorageManager;
 
   GitRepositoryImpl({@required this.gitDataSource, @required this.localStorageManager});
 
@@ -42,13 +42,17 @@ class GitRepositoryImpl implements GitRepository{
         return Right(treeNodeEntity.treeNodeList);
 
       GithubTreeModel githubTreeModel = await gitDataSource.getGithubTree(treeNodeEntity.id);
-      return Right(githubTreeModel.tree.map((e) {
+      List<TreeNodeEntity> treeNodeEntityList = githubTreeModel.tree.map((e) {
         TreeNodeEntity nodeEntity = TreeNodeEntity.from(e);
         nodeEntity.path = (treeNodeEntity.path??"") + "/"+ nodeEntity.fileName;
         nodeEntity.branch = treeNodeEntity.branch;
         nodeEntity.url = gitDataSource.getGitRootUrl() +"/"+treeNodeEntity.branch+nodeEntity.path;
         return nodeEntity;
-      }).toList());
+      }).toList();
+      treeNodeEntityList.sort((a, b){
+        return a.isLeafNode ^ b.isLeafNode ? (a.isLeafNode? 1:0): -1*(a.fileName.compareTo(b.fileName));
+      });
+      return Right(treeNodeEntityList);
     } on ServerException{
       return Left(ServerFailure());
     }

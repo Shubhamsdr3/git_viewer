@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:git_viewer/presentation/pages/git_viewer.dart';
-import 'package:git_viewer/presentation/pages/home_view.dart';
+import 'package:git_viewer/presentation/pages/home_page.dart';
+import 'package:git_viewer/presentation/pages/project_viewer_page.dart';
 
 const String HomeRoute = "/";
 const String ViewerRoute = "/viewer";
@@ -10,11 +10,11 @@ class Router {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case HomeRoute:
-        return MaterialPageRoute(builder: (_) => HomeView());
+        return MaterialPageRoute(builder: (_) => HomePage());
 
       case ViewerRoute:
         var projectEntity=settings.arguments;
-        return MaterialPageRoute(builder: (_) => GitViewer(projectEntity));
+        return MaterialPageRoute(builder: (_) => ProjectViewerPage(projectEntity));
 
       default:
         return MaterialPageRoute(

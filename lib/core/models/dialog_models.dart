@@ -1,0 +1,8 @@
+
+class DialogRequest{
+
+}
+
+class DialogResponse{
+
+}

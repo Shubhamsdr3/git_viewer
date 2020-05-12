@@ -1,13 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
-import 'package:git_viewer/presentation/pages/base_view.dart';
-import 'package:git_viewer/presentation/viewmodels/git_viewer_viewmodels.dart';
+import 'package:git_viewer/core/views/base_view.dart';
+import 'package:git_viewer/presentation/viewmodels/file_explorer_view_model.dart';
+import 'package:git_viewer/presentation/viewmodels/project_viewer_viewmodels.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
+import 'branch_selector_view.dart';
+
 
 typedef Function OnFileSelected(TreeNodeEntity filename);
+
+
+Widget get fileExplorer{
+  return Builder(
+    builder: (context) {
+      TreeNodeEntity rootNode = Provider.of<ProjectViewerViewModel>(context).rootNode;
+      return Container(
+        width: 250,
+        decoration: BoxDecoration(border: Border.all()),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              height: 30,
+              decoration: BoxDecoration(border: Border.all()),
+              child: BranchSelectorView(),
+            ),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(border: Border.all()),
+                child: rootNode==null ? Container():
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: FileExplorer(nodeEntity: rootNode)),
+                )
+              ),
+            )
+          ],
+        ),
+      );
+    }
+  );
+}
 
 
 class FileExplorer extends StatelessWidget {
@@ -29,7 +68,7 @@ class FileExplorer extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 if(nodeEntity.isLeafNode) {
-                  Provider.of<GVViewModel>(
+                  Provider.of<ProjectViewerViewModel>(
                       context, listen: false).addNodeInTab(nodeEntity);
                   return;
                 }
