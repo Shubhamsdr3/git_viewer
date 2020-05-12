@@ -19,7 +19,9 @@ class FileViewer extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: TextField(
-                enabled: false,
+                decoration: InputDecoration(),
+                maxLines: null,
+                readOnly: false,
                 controller: textEditingController
             ),
           ),
