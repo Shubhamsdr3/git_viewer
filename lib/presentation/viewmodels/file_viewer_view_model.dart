@@ -9,11 +9,13 @@ class FileViewerViewModel extends BaseViewModel{
 
   String _content;
   FileViewerViewModel();
+  TreeNodeEntity nodeEntity;
 
   String get content => _content;
 
 
   Future fetchContent(TreeNodeEntity nodeEntity) async {
+    this.nodeEntity=nodeEntity;
     setBusy(true);
     final failureOrContent = await gitRepository.getRawContent(nodeEntity);
     failureOrContent.fold(

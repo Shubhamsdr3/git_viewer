@@ -4,7 +4,10 @@ import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/core/views/base_view.dart';
 import 'package:git_viewer/presentation/viewmodels/file_viewer_view_model.dart';
 import 'package:git_viewer/presentation/viewmodels/project_viewer_viewmodels.dart';
+import 'package:git_viewer/presentation/widgets/code_viewer.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
+
 
 
 Widget get fileViewer  {
@@ -54,13 +57,7 @@ class FileViewer extends StatelessWidget {
         SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(4.0),
-            child: TextField(
-                decoration: new InputDecoration(
-                    border: InputBorder.none,),
-                maxLines: null,
-                readOnly: false,
-                controller: textEditingController
-            ),
+            child: CodeViewer(code: model.content, filename: model.nodeEntity.fileName,),
           ),
         );
       },
@@ -68,6 +65,7 @@ class FileViewer extends StatelessWidget {
     );
   }
 }
+
 
 class FileSelectionTabs extends StatelessWidget {
   @override
