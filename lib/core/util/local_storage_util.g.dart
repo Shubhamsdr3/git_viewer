@@ -8,7 +8,7 @@ part of 'local_storage_util.dart';
 
 ExpiryObject _$ExpiryObjectFromJson(Map<String, dynamic> json) {
   return ExpiryObject(
-    content: json['object'],
+    content: json['content'],
     expireAt: json['expireAt'] == null
         ? null
         : DateTime.parse(json['expireAt'] as String),
@@ -17,6 +17,6 @@ ExpiryObject _$ExpiryObjectFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$ExpiryObjectToJson(ExpiryObject instance) =>
     <String, dynamic>{
-      'object': instance.content,
+      'content': instance.content,
       'expireAt': instance.expireAt?.toIso8601String(),
     };

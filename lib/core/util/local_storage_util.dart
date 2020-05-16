@@ -7,17 +7,16 @@ part 'local_storage_util.g.dart';
 
 // References: https://www.filledstacks.com/snippet/shared-preferences-service-in-flutter-for-code-maintainability/
 
-String OBJECT_EXPIRED = '-1';
+const String OBJECT_EXPIRED = '-1';
 
 @JsonSerializable()
 class ExpiryObject {
-  dynamic content;
-  DateTime expireAt;
-
   ExpiryObject({this.content, this.expireAt});
-
   factory ExpiryObject.fromJson(Map<String, dynamic> json) => _$ExpiryObjectFromJson(json);
   Map<String, dynamic> toJson() => _$ExpiryObjectToJson(this);
+
+  dynamic content;
+  DateTime expireAt;
 
 }
 
@@ -26,14 +25,8 @@ class LocalStorageUtil {
   static SharedPreferences _preferences;
 
   static Future<LocalStorageUtil> getInstance() async {
-    if (_instance == null) {
-      _instance = LocalStorageUtil();
-    }
-
-    if (_preferences == null) {
-      _preferences = await SharedPreferences.getInstance();
-    }
-
+    _instance ??= LocalStorageUtil();
+    _preferences ??= await SharedPreferences.getInstance();
     return _instance;
   }
 
@@ -59,21 +52,20 @@ class LocalStorageUtil {
     }
 
     if(value is List<dynamic>) {
-      List<dynamic> v = value;
-      _preferences.setStringList(key, v.map((e) => json.encode(e)).toList());
+      final List<dynamic> v = value;
+      _preferences.setStringList(key, v.map((dynamic e) => json.encode(e)).toList());
     }
 
 
     if (value is Map<String, dynamic>){
-      value = json.encode(value);
-      _preferences.setString(key, value);
+      _preferences.setString(key, json.encode(value));
     }
 
   }
 
-  dynamic _getExpiryObject(String key, var value){
+  dynamic _getExpiryObject(String key, dynamic value){
     try{
-      ExpiryObject object =  ExpiryObject.fromJson(value);
+      final ExpiryObject object =  ExpiryObject.fromJson(value as Map<String, dynamic>);
       if(object.expireAt.isBefore(DateTime.now())){
         _preferences.remove(key);
         return OBJECT_EXPIRED;
@@ -93,21 +85,21 @@ class LocalStorageUtil {
   }
 
   dynamic getFromDisk(String key) {
-    var value = get(key);
-    if(value is List){
-      print(value);
-      return (value as List).map((e) => json.decode(e)).toList();
+    dynamic value = get(key);
+    if(value is List<String>){
+      return value.map<dynamic>((String e) => json.decode(e)).toList();
     }
     try {
-      value = json.decode(value);
+      value = json.decode(value as String);
     }
     catch(e){
-      print(e);
       return value;
     }
-    dynamic expiryResponse = _getExpiryObject(key, value);
-    if (expiryResponse==OBJECT_EXPIRED) return null;
-    if(expiryResponse==null) return value;
+    final dynamic expiryResponse = _getExpiryObject(key, value);
+    if (expiryResponse==OBJECT_EXPIRED)
+     return null;
+    if(expiryResponse==null)
+     return value;
     return expiryResponse;
   }
 
