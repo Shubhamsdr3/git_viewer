@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 
 
-abstract class GitDataSource {
+abstract class GitRemoteDataSource {
 
   String userName;
   String projectName;
@@ -18,9 +18,10 @@ abstract class GitDataSource {
   Future<GithubTreeModel> getGithubTree(String parentTreeId);
   Future<String> getGitContent(String branchName, String filePath);
   String getGitRootUrl();
+  String getContentUrl(String branchName, String filePath);
 }
 
-class GitDataSourceImpl implements GitDataSource{
+class GitRemoteDataSourceImpl implements GitRemoteDataSource{
 
   @override
   String projectName = 'digyed_reader';
@@ -45,7 +46,7 @@ class GitDataSourceImpl implements GitDataSource{
 
   final http.Client client;
 
-  GitDataSourceImpl({@required this.client});
+  GitRemoteDataSourceImpl({@required this.client});
 
   dynamic _fetchDataFromApi(String url, Function(String) decoder) async {
     dynamic header = {
@@ -111,6 +112,10 @@ class GitDataSourceImpl implements GitDataSource{
     };
     dynamic data =  await _fetchDataFromApi(url, decoder);
     return data;
+  }
+
+  String getContentUrl(String branchName, String filePath){
+    return contentUrl + '/' + branchName + filePath;
   }
 
   @override

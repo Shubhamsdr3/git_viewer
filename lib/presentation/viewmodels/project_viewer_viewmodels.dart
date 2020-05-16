@@ -11,7 +11,7 @@ import 'package:git_viewer/core/viewmodels/base_view_model.dart';
 
 class BranchViewModel extends BaseViewModel{
   GitRepository gitRepository = sl<GitRepository>();
-  GitDataSource gitDataSource = sl<GitDataSource>();
+  GitRemoteDataSource gitDataSource = sl<GitRemoteDataSource>();
 
   List<BranchEntity> _branchList;
   ProjectEntity _projectEntity;

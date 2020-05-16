@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 
 import 'core/util/local_storage_util.dart';
 import 'data/datasources/git_data_source.dart';
+import 'data/datasources/git_local_data_source.dart';
 import 'data/repositories/git_repository_impl.dart';
 import 'domain/repositories/git_repository.dart';
 
@@ -34,13 +35,18 @@ Future<void> init() async {
   sl.registerLazySingleton<GitRepository>(
     () => GitRepositoryImpl(
       gitDataSource: sl(),
-      localStorageManager: sl()
+      localStorageManager: sl(),
+      gitLocalDataSource: sl(),
     ),
   );
 
   // Data sources
-  sl.registerLazySingleton<GitDataSource>(
-    () => GitDataSourceImpl(client: sl()),
+  sl.registerLazySingleton<GitRemoteDataSource>(
+    () => GitRemoteDataSourceImpl(client: sl()),
+  );
+
+  sl.registerLazySingleton<GitLocalDataSource>(
+        () => GitLocalDataSourceImpl(localStorageUtil: sl()),
   );
 
   //! External

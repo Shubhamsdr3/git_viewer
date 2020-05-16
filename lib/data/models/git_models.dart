@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'git_models.g.dart';
 
+
 @JsonSerializable()
 class GithubTreeNodeModel extends Equatable {
   String path;
@@ -18,7 +19,6 @@ class GithubTreeNodeModel extends Equatable {
   Map<String, dynamic> toJson() => _$GithubTreeNodeModelToJson(this);
 
   bool get isLeafNode => type=='blob';
-
 
 }
 

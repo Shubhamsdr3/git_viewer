@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:git_viewer/core/error/exceptions.dart';
 import 'package:git_viewer/core/error/failures.dart';
 import 'package:git_viewer/data/datasources/git_data_source.dart';
+import 'package:git_viewer/data/datasources/git_local_data_source.dart';
 import 'package:git_viewer/data/models/git_models.dart';
 import 'package:git_viewer/domain/entities/git_entities.dart';
 import 'package:git_viewer/domain/repositories/git_repository.dart';
@@ -19,10 +20,11 @@ final String PROJECT_ENTITY_LIST_KEY = 'project_entity_list';
 
 class GitRepositoryImpl implements GitRepository{
 
-  final GitDataSource gitDataSource;
+  final GitRemoteDataSource gitDataSource;
+  final GitLocalDataSource gitLocalDataSource;
   final LocalStorageUtil localStorageManager;
 
-  GitRepositoryImpl({@required this.gitDataSource, @required this.localStorageManager});
+  GitRepositoryImpl({@required this.gitDataSource, @required this.localStorageManager, @required this.gitLocalDataSource});
 
 
   @override
@@ -76,8 +78,13 @@ class GitRepositoryImpl implements GitRepository{
   @override
   Future<Either<Failure, String>> getRawContent(TreeNodeEntity treeNodeEntity) async {
     try {
-      String content =  await gitDataSource.getGitContent(
-          treeNodeEntity.branch, treeNodeEntity.path);
+      String contentUrl = gitDataSource.getContentUrl(treeNodeEntity.branch, treeNodeEntity.path);
+      String content = gitLocalDataSource.getGitContent(contentUrl);
+      if(content==null) {
+        content = await gitDataSource.getGitContent(
+            treeNodeEntity.branch, treeNodeEntity.path);
+        gitLocalDataSource.saveGitContent(contentUrl, content);
+      }
       return Right(content);
     }  on ServerException{
       return Left(ServerFailure());
@@ -88,9 +95,13 @@ class GitRepositoryImpl implements GitRepository{
   Future<Either<Failure, List<ProjectEntity>>> getProjectEntityList() async {
     try {
       List<dynamic> list = localStorageManager.getFromDisk(PROJECT_ENTITY_LIST_KEY);
-      List<ProjectEntity> list2 = list.map((e) => ProjectEntity.fromJson(json.decode(e))).toList();
+      print(list);
+      if(list==null)
+        return Right([]);
+      List<ProjectEntity> list2 = list.map((e) => ProjectEntity.fromJson(e)).toList();
       return Right(list2);
-    } catch (e){
+    } catch (e, stacktrace){
+      print(stacktrace);
       return Left(CacheFailure());
     }
 
@@ -99,11 +110,12 @@ class GitRepositoryImpl implements GitRepository{
   @override
   Future<Either<Failure, Unit>> saveProjectEntityList(List<ProjectEntity> projectEntityList) async {
     try {
-      localStorageManager.saveToDisk(PROJECT_ENTITY_LIST_KEY,
-          projectEntityList.map((e) => json.encode(e.toJson())).toList());
+      localStorageManager.saveToDisk(key: PROJECT_ENTITY_LIST_KEY,
+          value: projectEntityList.map((e) => e.toJson()).toList());
       return Right(unit);
     }
-    catch(e){
+    catch(e, stacktrace){
+      print(stacktrace);
       return Left(CacheFailure());
     }
   }
